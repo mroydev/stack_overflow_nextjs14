@@ -29,7 +29,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     handleThemeChange();
-  }, [0]); // [0]: Runs only once on mount. [mode] : Runs whenever mode changes.
+  }, []); // []: Runs only once on mount. [mode] : Runs whenever mode changes.
 
   return (
     <ThemeContext.Provider value={{ mode, setMode }}>
