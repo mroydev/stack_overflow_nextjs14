@@ -1,10 +1,55 @@
+import QuestionCard from '@/components/cards/QuestionCard';
 import HomeFilters from '@/components/home/HomeFilters';
 import Filter from '@/components/shared/Filter';
+import NoResult from '@/components/shared/NoResult';
 import LocalSearch from '@/components/shared/search/LocalSearch';
 import { Button } from '@/components/ui/button';
 import { HomePageFilters } from '@/constants/filters';
 import Link from 'next/link';
 import React from 'react';
+
+const questions = [
+  {
+    _id: '1',
+    title: 'what is javascript?',
+    tags: [
+      { _id: '1', name: 'javascript' },
+      { _id: '2', name: 'react' },
+    ],
+    author: {
+      _id: '1',
+      name: 'John Doe',
+      avatar: 'https://example.com/avatar.jpg',
+    },
+    upVotes: 10000,
+    views: 1500000,
+    answers: [
+      { text: 'Sample answer 1', author: 'Alice' },
+      { text: 'Sample answer 2', author: 'Bob' },
+    ],
+    createdAt: new Date('2023-11-15T12:00:00.000Z'),
+  },
+  {
+    _id: '2',
+    title: 'what is react?',
+    tags: [
+      { _id: '1', name: 'react' },
+      { _id: '2', name: 'nextjs' },
+    ],
+    author: {
+      _id: '2',
+      name: 'Beaue Cranes',
+      avatar: 'https://example.com/avatar.jpg',
+    },
+    upVotes: 10,
+    views: 100,
+    answers: [
+      { text: 'Sample answer 1', author: 'Alice' },
+      { text: 'Sample answer 2', author: 'Bob' },
+    ],
+    createdAt: new Date('2022-06-15T12:00:00.000Z'),
+  },
+];
 
 const Home = () => {
   return (
@@ -35,6 +80,31 @@ const Home = () => {
       </div>
 
       <HomeFilters />
+
+      <div className=" mt-10 flex w-full flex-col gap-6">
+        {questions.length > 0 ? (
+          questions.map((question) => (
+            <QuestionCard
+              key={question._id}
+              _id={question._id}
+              title={question.title}
+              tags={question.tags}
+              author={question.author}
+              upVotes={question.upVotes}
+              views={question.views}
+              answers={question.answers}
+              createdAt={question.createdAt}
+            />
+          ))
+        ) : (
+          <NoResult
+            title="There’s no question to show"
+            description="Be the first to break the silence! 🚀 Ask a Question and kickstart the discussion. our query could be the next big thing others learn from. Get involved! 💡"
+            link="/ask-question"
+            linkTitle="Ask a Question"
+          />
+        )}
+      </div>
     </>
   );
 };
