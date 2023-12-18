@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const isConnected: boolean = false;
+let isConnected: boolean = false;
 
 export const connectToDatabase = async () => {
   // this is to prevent unknown field queries
@@ -19,7 +19,7 @@ export const connectToDatabase = async () => {
       dbName: 'devFlow',
     });
 
-    // isConnected = true;
+    isConnected = true;
 
     console.log('MongoDB is connected');
   } catch (error) {
