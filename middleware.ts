@@ -27,5 +27,10 @@ export const config = {
     '/api/webhook',
     '/api/chatgpt',
     '/question/:id',
+    '/tags',
+    '/tags/:id',
+    '/profile/:id',
+    '/community',
+    '/jobs',
   ],
 };
