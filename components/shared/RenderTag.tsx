@@ -5,7 +5,7 @@ import React from 'react';
 interface Props {
   _id: string;
   name: string;
-  totalQuestions: number;
+  totalQuestions?: number;
   showCount?: boolean;
 }
 
