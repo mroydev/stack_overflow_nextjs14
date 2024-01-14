@@ -11,7 +11,14 @@ const AskQuestion = async () => {
 
   const mongoUser = await getUserById({ userId });
 
-  console.log(mongoUser);
+  if (!mongoUser) {
+    return (
+      <p className="text-2xl font-semibold text-slate-800">
+        User not found or not authenticated properly.
+      </p>
+    );
+  }
+
   return (
     <div>
       <Question mongoUserId={JSON.stringify(mongoUser._id)} />
