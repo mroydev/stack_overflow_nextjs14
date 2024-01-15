@@ -1,9 +1,14 @@
-import UserCard from '@/components/cards/UserCard';
+// import UserCard from '@/components/cards/UserCard';
 import Filter from '@/components/shared/Filter';
 import LocalSearch from '@/components/shared/search/LocalSearch';
 import { UserFilters } from '@/constants/filters';
 import { getAllUsers } from '@/lib/actions/user.action';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+const UserCard = dynamic(() => import('@/components/cards/UserCard'), {
+  ssr: false,
+});
 
 const Page = async () => {
   const result = await getAllUsers({});
