@@ -4,26 +4,22 @@ import { auth } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import React from 'react';
 
-const AskQuestion = async () => {
+const Page = async () => {
   const { userId } = auth();
 
   if (!userId) redirect('/sign-in');
 
   const mongoUser = await getUserById({ userId });
 
-  if (!mongoUser) {
-    return (
-      <p className="text-2xl font-semibold text-slate-800">
-        User not found or not authenticated properly.
-      </p>
-    );
-  }
-
   return (
     <div>
-      <Question mongoUserId={JSON.stringify(mongoUser._id)} />
+      <h1 className="h1-bold text-dark100_light900">Ask a question</h1>
+
+      <div className="mt-9">
+        <Question mongoUserId={JSON.stringify(mongoUser._id)} />
+      </div>
     </div>
   );
 };
 
-export default AskQuestion;
+export default Page;

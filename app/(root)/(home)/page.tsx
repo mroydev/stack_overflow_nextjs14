@@ -2,14 +2,13 @@ import QuestionCard from '@/components/cards/QuestionCard';
 import HomeFilters from '@/components/home/HomeFilters';
 import Filter from '@/components/shared/Filter';
 import NoResult from '@/components/shared/NoResult';
-import LocalSearch from '@/components/shared/search/LocalSearch';
+import LocalSearchbar from '@/components/shared/search/LocalSearch';
 import { Button } from '@/components/ui/button';
 import { HomePageFilters } from '@/constants/filters';
 import { getQuestions } from '@/lib/actions/question.action';
 import Link from 'next/link';
-import React from 'react';
 
-const Home = async () => {
+export default async function Home() {
   const result = await getQuestions({});
 
   return (
@@ -25,13 +24,14 @@ const Home = async () => {
       </div>
 
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
-        <LocalSearch
+        <LocalSearchbar
           route="/"
           iconPosition="left"
           imgSrc="/assets/icons/search.svg"
           placeholder="Search for questions"
           otherClasses="flex-1"
         />
+
         <Filter
           filters={HomePageFilters}
           otherClasses="min-h-[56px] sm:min-w-[170px]"
@@ -41,7 +41,7 @@ const Home = async () => {
 
       <HomeFilters />
 
-      <div className=" mt-10 flex w-full flex-col gap-6">
+      <div className="mt-10 flex w-full flex-col gap-6">
         {result.questions.length > 0 ? (
           result.questions.map((question) => (
             <QuestionCard
@@ -67,6 +67,4 @@ const Home = async () => {
       </div>
     </>
   );
-};
-
-export default Home;
+}

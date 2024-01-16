@@ -1,11 +1,9 @@
 'use client';
-
 import React, { useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
-import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -16,27 +14,30 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { questionSchema } from '@/lib/validations';
+import { Button } from '../ui/button';
+import { QuestionSchema } from '@/lib/validations';
 import { Badge } from '../ui/badge';
 import Image from 'next/image';
 import { createQuestion } from '@/lib/actions/question.action';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { useTheme } from '@/context/ThemeProvider';
+
+const type: any = 'create';
 
 interface Props {
   mongoUserId: string;
 }
 
-const type: any = 'create';
-
 const Question = ({ mongoUserId }: Props) => {
+  const { mode } = useTheme();
   const editorRef = useRef(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const pathname = usePathname();
   const router = useRouter();
+  const pathname = usePathname();
 
   // 1. Define your form.
-  const form = useForm<z.infer<typeof questionSchema>>({
-    resolver: zodResolver(questionSchema),
+  const form = useForm<z.infer<typeof QuestionSchema>>({
+    resolver: zodResolver(QuestionSchema),
     defaultValues: {
       title: '',
       explanation: '',
@@ -45,12 +46,13 @@ const Question = ({ mongoUserId }: Props) => {
   });
 
   // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof questionSchema>) {
-    // Do something with the form values.
+  async function onSubmit(values: z.infer<typeof QuestionSchema>) {
     setIsSubmitting(true);
+
     try {
-      // make async await
-      // contain  all form data
+      // make an async call to your API -> create a question
+      // contain all form data
+
       await createQuestion({
         title: values.title,
         content: values.explanation,
@@ -116,7 +118,6 @@ const Question = ({ mongoUserId }: Props) => {
               <FormLabel className="paragraph-semibold text-dark400_light800">
                 Question Title <span className="text-primary-500">*</span>
               </FormLabel>
-
               <FormControl className="mt-3.5">
                 <Input
                   className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
@@ -131,7 +132,6 @@ const Question = ({ mongoUserId }: Props) => {
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="explanation"
@@ -141,7 +141,6 @@ const Question = ({ mongoUserId }: Props) => {
                 Detailed explanation of your problem{' '}
                 <span className="text-primary-500">*</span>
               </FormLabel>
-
               <FormControl className="mt-3.5">
                 <Editor
                   apiKey={process.env.NEXT_PUBLIC_TINY_EDITOR_API_KEY}
@@ -177,6 +176,8 @@ const Question = ({ mongoUserId }: Props) => {
                       'codesample | bold italic forecolor | alignleft aligncenter |' +
                       'alignright alignjustify | bullist numlist',
                     content_style: 'body { font-family:Inter; font-size:16px }',
+                    skin: mode === 'dark' ? 'oxide-dark' : 'oxide',
+                    content_css: mode === 'dark' ? 'dark' : 'light',
                   }}
                 />
               </FormControl>
@@ -188,7 +189,6 @@ const Question = ({ mongoUserId }: Props) => {
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="tags"
@@ -197,7 +197,6 @@ const Question = ({ mongoUserId }: Props) => {
               <FormLabel className="paragraph-semibold text-dark400_light800">
                 Tags <span className="text-primary-500">*</span>
               </FormLabel>
-
               <FormControl className="mt-3.5">
                 <>
                   <Input
@@ -215,7 +214,6 @@ const Question = ({ mongoUserId }: Props) => {
                           onClick={() => handleTagRemove(tag, field)}
                         >
                           {tag}
-
                           <Image
                             src="/assets/icons/close.svg"
                             alt="Close icon"
@@ -233,7 +231,6 @@ const Question = ({ mongoUserId }: Props) => {
                 Add up to 3 tags to describe what your question is about. You
                 need to press enter to add a tag.
               </FormDescription>
-
               <FormMessage className="text-red-500" />
             </FormItem>
           )}
