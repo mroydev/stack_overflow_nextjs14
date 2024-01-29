@@ -5,6 +5,7 @@ import { connectToDatabase } from '../mongoose';
 import Tag from '@/database/tag.model';
 import { revalidatePath } from 'next/cache';
 import {
+  CreateQuestionParams,
   DeleteQuestionParams,
   EditQuestionParams,
   GetQuestionByIdParams,
@@ -68,17 +69,22 @@ export async function getQuestions(params: GetQuestionsParams) {
   }
 }
 
-export async function createQuestion(params: any) {
+export async function createQuestion(params: CreateQuestionParams) {
   try {
     connectToDatabase();
+
     const { title, content, tags, author, path } = params;
 
-    // create a question
-    const question = await Question.create({ title, content, author });
+    // Create the question
+    const question = await Question.create({
+      title,
+      content,
+      author,
+    });
 
     const tagDocuments = [];
 
-    // create the tags or get them already exist
+    // Create the tags or get them if they already exist
     for (const tag of tags) {
       const existingTag = await Tag.findOneAndUpdate(
         { name: { $regex: new RegExp(`^${tag}$`, 'i') } },
@@ -94,11 +100,20 @@ export async function createQuestion(params: any) {
     });
 
     // Create an interaction record for the user's ask_question action
+    await Interaction.create({
+      user: author,
+      action: 'ask_question',
+      question: question._id,
+      tags: tagDocuments,
+    });
 
     // Increment author's reputation by +5 for creating a question
+    await User.findByIdAndUpdate(author, { $inc: { reputation: 5 } });
 
     revalidatePath(path);
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export async function getQuestionById(params: GetQuestionByIdParams) {
@@ -149,7 +164,15 @@ export async function upVoteQuestion(params: QuestionVoteParams) {
       throw new Error('Question not found');
     }
 
-    // Increment author's reputation
+    // Increment author's reputation by +1/-1 for upVoting/revoking an upvote to the question
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasUpVoted ? -1 : 1 },
+    });
+
+    // Increment author's reputation by +10/-10 for receiving an upvote/downvote to the question
+    await User.findByIdAndUpdate(question.author, {
+      $inc: { reputation: hasUpVoted ? -10 : 10 },
+    });
 
     revalidatePath(path);
   } catch (error) {

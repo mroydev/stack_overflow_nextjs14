@@ -11,6 +11,7 @@ import {
 import Question from '@/database/question.model';
 import { revalidatePath } from 'next/cache';
 import Interaction from '@/database/interaction.model';
+import User from '@/database/user.model';
 
 export async function createAnswer(params: CreateAnswerParams) {
   try {
@@ -21,11 +22,19 @@ export async function createAnswer(params: CreateAnswerParams) {
     const newAnswer = await Answer.create({ content, author, question });
 
     // Add the answer to the question's answers array
-    await Question.findByIdAndUpdate(question, {
+    const questionObject = await Question.findByIdAndUpdate(question, {
       $push: { answers: newAnswer._id },
     });
 
-    // TODO: Add interaction...
+    await Interaction.create({
+      user: author,
+      action: 'answer',
+      question,
+      answer: newAnswer._id,
+      tags: questionObject.tags,
+    });
+
+    await User.findByIdAndUpdate(author, { $inc: { reputation: 10 } });
 
     revalidatePath(path);
   } catch (error) {
@@ -45,11 +54,11 @@ export async function getAnswers(params: GetAnswersParams) {
     let sortOptions = {};
 
     switch (sortBy) {
-      case 'highestUpvotes':
-        sortOptions = { upvotes: -1 };
+      case 'highestUpVotes':
+        sortOptions = { upVotes: -1 };
         break;
-      case 'lowestUpvotes':
-        sortOptions = { upvotes: 1 };
+      case 'lowestUpVotes':
+        sortOptions = { upVotes: 1 };
         break;
       case 'recent':
         sortOptions = { createdAt: -1 };
@@ -109,6 +118,13 @@ export async function upVoteAnswer(params: AnswerVoteParams) {
     }
 
     // Increment author's reputation
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasUpVoted ? -2 : 2 },
+    });
+
+    await User.findByIdAndUpdate(answer.author, {
+      $inc: { reputation: hasUpVoted ? -10 : 10 },
+    });
 
     revalidatePath(path);
   } catch (error) {
@@ -126,7 +142,7 @@ export async function downVoteAnswer(params: AnswerVoteParams) {
     let updateQuery = {};
 
     if (hasDownVoted) {
-      updateQuery = { $pull: { downVotes: userId } };
+      updateQuery = { $pull: { downvote: userId } };
     } else if (hasUpVoted) {
       updateQuery = {
         $pull: { upVotes: userId },
@@ -144,7 +160,14 @@ export async function downVoteAnswer(params: AnswerVoteParams) {
       throw new Error('Answer not found');
     }
 
-    // decrement author's reputation
+    // Increment author's reputation
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasDownVoted ? -2 : 2 },
+    });
+
+    await User.findByIdAndUpdate(answer.author, {
+      $inc: { reputation: hasDownVoted ? -10 : 10 },
+    });
 
     revalidatePath(path);
   } catch (error) {
