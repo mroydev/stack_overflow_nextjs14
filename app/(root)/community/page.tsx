@@ -8,6 +8,12 @@ import dynamic from 'next/dynamic';
 import { SearchParamsProps } from '@/types';
 import Pagination from '@/components/shared/Pagination';
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Community | Dev Overflow',
+};
+
 const UserCard = dynamic(() => import('@/components/cards/UserCard'), {
   ssr: false,
 });
