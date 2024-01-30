@@ -11,6 +11,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { downVoteAnswer, upVoteAnswer } from '@/lib/actions/answer.action';
 import { toggleSaveQuestion } from '@/lib/actions/user.action';
 import { viewQuestion } from '@/lib/actions/interaction.action';
+import { toast } from '../ui/use-toast';
 
 interface Props {
   type: string;
@@ -42,10 +43,20 @@ const Votes = ({
       questionId: JSON.parse(itemId),
       path: pathname,
     });
+    return toast({
+      title: `Question ${
+        !hasSaved ? 'Saved in' : 'Removed from'
+      } your collection`,
+      variant: !hasSaved ? 'default' : 'destructive',
+    });
   };
+
   const handleVote = async (action: string) => {
     if (!userId) {
-      return;
+      return toast({
+        title: 'Please login to vote',
+        description: 'You must be logged in to vote on a question or answer',
+      });
     }
 
     if (action === 'upVote') {
@@ -66,8 +77,10 @@ const Votes = ({
           path: pathname,
         });
       }
-      // todo: show a toast
-      return;
+      return toast({
+        title: `UpVote ${!hasUpVoted ? 'Successful' : 'Removed'}`,
+        variant: !hasUpVoted ? 'default' : 'destructive',
+      });
     }
 
     if (action === 'downVote') {
@@ -89,7 +102,10 @@ const Votes = ({
         });
       }
 
-      // todo: show a toast
+      return toast({
+        title: `DownVote ${!hasUpVoted ? 'Successful' : 'Removed'}`,
+        variant: !hasUpVoted ? 'default' : 'destructive',
+      });
     }
   };
 
